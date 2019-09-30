@@ -37,8 +37,13 @@ module HtmlCompressor
     def call env
       status, headers, body = @app.call(env)
 
-      path = Rails.application.routes.recognize_path(env['PATH_INFO'])
-      compress_info = path[:compress]
+      if headers.key? 'Content-Type' and headers['Content-Type'] =~ /html/
+        path = Rails.application.routes.recognize_path(env['PATH_INFO'])
+        compress_info = path[:compress]
+      else
+        compress_info = nil
+      end
+
       should_we_compress = @options[:compress_by_default]
       if (compress_info == true)
         should_we_compress = true
